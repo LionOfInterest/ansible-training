@@ -7,19 +7,72 @@ Please keep in mind that this training has been designed for Linux users.
 
 ## Prerequisites:
 
-- Have docker and docker-compose installed.
+- Have docker and docker-compose installed ;
+- Read [Ansible documentation](https://docs.ansible.com/ansible/latest/getting_started/index.html).
 
-## Get started:
+## Initialize the infrastructure:
 
-1. Run the initialization script `./init_training.sh`. It builds the necessary infrastructure for the training.
+Run the initialization script `./ansible_training start`. It builds the necessary infrastructure for the training.
 
-2. Once the docker-compose is up and running, execute the command :
+Throughout this training, here's the infrastructure you'll be working on.
+
+![Infrastructure](images/infrastructure.png)
+
+This infrastructure simulates a real situation : we execute Ansible tasks from a node (referred here as the **control node**) to remote nodes (referred here as the **managed nodes**).
+
+## Hands-on Ansible : basics
+
+### First manipulations
+
+1. Once the docker-compose is up and running, execute the command :
 
 ```bash
 docker-compose exec -it control_node bash
 ```
 
-3. Place yourself in root's home folder.
-```
+2. Place yourself in root's home folder.
+
+```bash
 cd /root
 ```
+
+3. Ansible allows you to handle remote hosts, as long as you can join them by SSH.
+The first step to any Ansible operation is to define these hosts, through an **`inventory`** file.
+Go on and create a file named `hosts` that will contain the IPs of our managed nodes.
+
+```bash
+cat hosts
+172.20.20.3
+172.20.20.4
+```
+
+4. Let's execute our first Ansible command : pinging our remote hosts. For this operation, we need to tell Ansible :
+- The name of the hosts we want to execute commands on, we can use the `all` pattern to execute it on every host in the inventory ;
+- The file that contains the inventory. It's specified with the `-i filename` option ;
+- The ping action. We can use a built-in Ansible module `ping`, that can be specified with the `-m module` option.
+
+```bash
+ansible all -i hosts -m ping
+```
+
+Your output should look like this :
+```json
+172.20.20.3 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+172.20.20.4 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+```
+
+You're not compelled
+
+## Hands-on Ansible : 
