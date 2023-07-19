@@ -1,0 +1,43 @@
+services:
+  control_node:
+    hostname: control_node
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    networks:
+      ans-net:
+        ipv4_address: 172.20.20.2
+    tty: true
+
+  managed_node1:
+    cap_add:
+      - SYS_ADMIN
+      - NET_ADMIN
+    build:
+      context: ./managed_nodes
+      dockerfile: Dockerfile
+    hostname: managed_node1
+    networks:
+      ans-net:
+        ipv4_address: 172.20.20.3
+    tty: true
+
+  managed_node2:
+    cap_add:
+      - SYS_ADMIN
+      - NET_ADMIN
+    build:
+      context: ./managed_nodes
+      dockerfile: Dockerfile
+    hostname: managed_node2
+    networks:
+      ans-net:
+        ipv4_address: 172.20.20.4
+    tty: true
+
+networks:
+  ans-net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.20.20.0/24"
