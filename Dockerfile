@@ -10,4 +10,5 @@ RUN echo "$ssh_pub_key" > /root/.ssh/id_rsa.pub \
     && chmod -R 0700 /root/.ssh \
     && apk update \
     && apk add py3-pip curl openssh bash nano vim \
+    && echo "StrictHostKeyChecking accept-new" >> /etc/ssh/ssh_config \
     && pip install ansible
