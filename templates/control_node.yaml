@@ -1,0 +1,11 @@
+services:
+  control_node:
+    hostname: control_node
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    networks:
+      ans-net:
+        ipv4_address: 172.20.20.2
+    tty: true
+

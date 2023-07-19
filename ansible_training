@@ -1,0 +1,91 @@
+#! /bin/bash
+
+set -eu
+
+### Utils
+
+build_docker_compose() {
+	if [[ -z "$MANAGED_NODES" ]]; then
+		echo "You need to set the MANAGES_NODES variable in your env file"
+		exit 1
+	fi
+
+	cat templates/control_node.yaml > docker-compose.yaml
+
+	HOST_ADDRESS=2
+	for NODE_ID in $(seq 1 "$MANAGED_NODES"); do
+		NODE_IP="172.20.20.""$(expr $HOST_ADDRESS + $NODE_ID)"
+		export NODE_ID NODE_IP
+		cat templates/managed_node.yaml | envsubst >> docker-compose.yaml
+	done
+
+	cat templates/network_configuration.yaml >> docker-compose.yaml
+}
+
+generate_ssh_keys_and_env() {
+	if [[ ! -f .id_rsa ]]; then
+		ssh-keygen -t rsa -b 4096 -f .id_rsa -N ''
+	fi
+
+	if [[ ! -f .env ]]; then
+		cp .env.example .env
+	fi
+	source .env
+
+}
+
+
+### Options-related functions
+
+show_usage() {
+    echo """Usage: $0 {help|rebuild|start|stop}
+
+help: Display this usage.
+rebuild: Reloads the configuration when changes are made.
+start: Start the Ansible training.
+stop: Stop the Ansible training."""
+	exit 0
+}
+
+stop_service() {
+    [[ -n "$(docker-compose ps -aq)" ]] && docker-compose stop && docker-compose down
+    exit 0
+}
+
+start_service() {
+	if [[ -f docker-compose.yaml ]] && [[ -n "$(docker-compose ps -aq)" ]]; then
+		echo "Already started, use the restart command if needed."
+		exit 1
+	fi
+
+	generate_ssh_keys_and_env
+	build_docker_compose
+	docker-compose build --build-arg ssh_pub_key="$(cat .id_rsa.pub)" --build-arg ssh_pri_key="$(cat .id_rsa)"
+	docker-compose up -d
+}
+
+rebuild_service() {
+	[[ -f docker-compose.yaml ]] && rm docker-compose.yaml
+	[[ -f docker-compose.yaml ]] && stop_service
+	start_service
+}
+
+### Arguments parsing
+
+case "$@" in
+	"--help" | "-h" | "help")
+		show_usage
+		;;
+	"rebuild")
+		rebuild_service
+		;;
+    "stop")
+        stop_service
+    	;;
+	"start")
+		start_service
+		;;
+	*)
+		show_usage
+		;;
+esac

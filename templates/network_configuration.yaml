@@ -1,0 +1,6 @@
+networks:
+  ans-net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.20.20.0/24"

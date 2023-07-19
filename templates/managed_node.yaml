@@ -1,0 +1,13 @@
+  managed_node${NODE_ID}:
+    cap_add:
+      - SYS_ADMIN
+      - NET_ADMIN
+    build:
+      context: ./managed_nodes
+      dockerfile: Dockerfile
+    hostname: managed_node${NODE_ID}
+    networks:
+      ans-net:
+        ipv4_address: "${NODE_IP}"
+    tty: true
+
