@@ -24,6 +24,13 @@ This infrastructure simulates a real situation : we execute Ansible tasks from a
 
 ### First manipulations
 
+0. The default configuration comes with 5 nodes, feel free to decrease or increase this number.
+```bash
+cat .env
+MANAGED_NODES=5
+```
+If you change this number, you'll need to rebuild the training : `./ansible-training rebuild`.
+
 1. Once the docker-compose is up and running, execute the command :
 
 ```bash
@@ -56,7 +63,7 @@ ansible all -i hosts -m ping
 ```
 
 Your output should look like this :
-```json
+```
 172.20.20.3 | SUCCESS => {
     "ansible_facts": {
         "discovered_interpreter_python": "/usr/bin/python3"
@@ -71,8 +78,25 @@ Your output should look like this :
     "changed": false,
     "ping": "pong"
 }
+
+...
+
 ```
 
-You're not compelled
+You're not compelled to ping them all, you can try to ping only one of them :
+
+```bash
+ansible 172.20.20.3 -i hosts -m ping
+
+172.20.20.3 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+```
 
 ## Hands-on Ansible : 
+
+TODO

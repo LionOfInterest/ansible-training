@@ -8,6 +8,6 @@
     hostname: managed_node${NODE_ID}
     networks:
       ans-net:
-        ipv4_address: "${NODE_IP}"
+        ipv4_address: ${NODE_IP}
     tty: true
 
